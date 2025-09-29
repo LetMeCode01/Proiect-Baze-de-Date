@@ -1,0 +1,126 @@
+--12a)
+SELECT c.nume AS client, e.nume AS produs, f.nume AS furnizor, m.nume AS magazin
+FROM CLIENT c
+JOIN COMANDA co ON c.id_client = co.id_client
+JOIN DETALII_COMANDA dc ON co.id_comanda = dc.id_comanda
+JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+JOIN FURNIZOR f ON e.id_furnizor = f.id_furnizor
+JOIN RAION r ON e.id_raion = r.id_raion
+JOIN MAGAZIN m ON r.id_magazin = m.id_magazin
+WHERE dc.cantitate > 1;
+
+--12b)
+SELECT e.nume AS produs, e.cantitate_stoc,
+       (SELECT AVG(cantitate_stoc) FROM ELECTRONIC) AS media_stocurilor,
+       CASE 
+           WHEN e.cantitate_stoc > (SELECT AVG(cantitate_stoc) FROM ELECTRONIC) THEN 'STOC MARE'
+           ELSE 'STOC MIC'
+       END AS situatie_stoc
+FROM ELECTRONIC e;
+
+--12c)
+SELECT m.nume AS magazin, SUM(dc.cantitate) AS total_vandute
+FROM DETALII_COMANDA dc
+JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+JOIN RAION r ON e.id_raion = r.id_raion
+JOIN MAGAZIN m ON r.id_magazin = m.id_magazin
+GROUP BY m.nume
+HAVING SUM(dc.cantitate) > 
+       (SELECT AVG(total) FROM (
+            SELECT SUM(dc2.cantitate) AS total
+            FROM DETALII_COMANDA dc2
+            GROUP BY dc2.id_comanda
+       ));
+       
+--12d)
+       
+SELECT 
+    c.id_comanda,cl.nume AS nume_client,c.data,
+    NVL(dc.firma_livrare, 'NEPRECIZATA') AS firma_livrare,
+    DECODE(dc.firma_livrare, 
+           'Fan Courier', 'LIVRARE RAPIDA', 
+           'STANDARD') AS tip_livrare
+FROM comanda c
+JOIN client cl ON c.id_client = cl.id_client
+JOIN detalii_comanda dc ON c.id_comanda = dc.id_comanda
+ORDER BY c.data DESC;
+
+--12e)
+SELECT 
+    A.id_angajat,
+    A.nume,
+    EXTRACT(MONTH FROM SYSDATE) - EXTRACT(MONTH FROM A.data_angajare) 
+        + 12 * (EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM A.data_angajare)) AS luni_lucrate,
+    LOWER(A.nume) || '@magazin' || A.id_magazin || '.com' AS email,
+    CASE 
+        WHEN MONTHS_BETWEEN(SYSDATE, A.data_angajare) >= 24 THEN 'VETERAN'
+        ELSE 'NOU'
+    END AS status_angajat,
+    SUBSTR(A.nume, 1, 3) AS prefix_nume
+FROM ANGAJAT A
+WHERE EXTRACT(DAY FROM A.data_angajare) = 15
+  AND EXTRACT(MONTH FROM A.data_angajare) = 3;
+
+
+--12f)
+WITH total_comenzi_client AS (
+    SELECT 
+        c.id_client,c.nume AS client,
+        SUM(e.pret_recomandat * dc.cantitate) AS valoare_totala,
+        COUNT(DISTINCT cm.id_comanda) AS nr_comenzi
+    FROM CLIENT c
+    JOIN COMANDA cm ON c.id_client = cm.id_client
+    JOIN DETALII_COMANDA dc ON cm.id_comanda = dc.id_comanda
+    JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+    GROUP BY c.id_client, c.nume
+)
+SELECT *
+FROM total_comenzi_client
+WHERE valoare_totala > 10000
+ORDER BY valoare_totala DESC;
+
+--13)
+UPDATE ANGAJAT
+SET salariu = salariu * 1.1
+WHERE id_magazin = (
+    SELECT id_magazin 
+    FROM MAGAZIN 
+    WHERE oras = 'Cluj'
+);
+--13b)
+UPDATE DETALII_COMANDA
+SET firma_livrare = 'GLS'
+WHERE id_comanda IN (
+    SELECT id_comanda 
+    FROM COMANDA
+    WHERE data > TO_DATE('2025-09-01','YYYY-MM-DD')
+);
+
+--13c)
+DELETE FROM COMANDA c
+WHERE NOT EXISTS (
+    SELECT dc.id_comanda
+    FROM DETALII_COMANDA dc
+    WHERE dc.id_comanda = c.id_comanda
+)
+AND c.data < ADD_MONTHS(SYSDATE, -1);
+
+--15)
+SELECT c.id_comanda, cl.nume AS nume_client, e.nume AS nume_produs, 
+       m.nume AS nume_magazin, f.nume AS furnizor, dc.firma_livrare
+FROM COMANDA c
+LEFT OUTER JOIN CLIENT cl ON c.id_client = cl.id_client
+LEFT OUTER JOIN DETALII_COMANDA dc ON c.id_comanda = dc.id_comanda
+LEFT OUTER JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+LEFT OUTER JOIN RAION r ON e.id_raion = r.id_raion
+LEFT OUTER JOIN MAGAZIN m ON r.id_magazin = m.id_magazin
+LEFT OUTER JOIN FURNIZOR f ON e.id_furnizor = f.id_furnizor;
+
+--15topn
+SELECT *
+FROM (
+    SELECT e.id_electronic, e.nume, e.pret_recomandat
+    FROM ELECTRONIC e
+    ORDER BY e.pret_recomandat DESC
+)
+WHERE ROWNUM <= 3;

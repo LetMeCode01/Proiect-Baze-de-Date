@@ -1,0 +1,299 @@
+DROP TABLE ANGAJAT CASCADE CONSTRAINTS;
+DROP TABLE COMANDA CASCADE CONSTRAINTS;
+DROP TABLE CLIENT CASCADE CONSTRAINTS;
+DROP TABLE DETALII_COMANDA CASCADE CONSTRAINTS;
+DROP TABLE ELECTRONIC CASCADE CONSTRAINTS;
+DROP TABLE RAION CASCADE CONSTRAINTS;
+DROP TABLE MAGAZIN CASCADE CONSTRAINTS;
+DROP TABLE FURNIZOR CASCADE CONSTRAINTS;
+
+--CREAREA TABELELOR
+CREATE TABLE MAGAZIN (
+    id_magazin INT PRIMARY KEY,
+    nume VARCHAR2(100),
+    oras VARCHAR2(50)
+);
+
+CREATE TABLE RAION (
+    id_raion INT PRIMARY KEY,
+    id_magazin INT NOT NULL REFERENCES MAGAZIN(id_magazin),
+    categorie VARCHAR2(50)
+);
+
+CREATE TABLE FURNIZOR (
+    id_furnizor INT PRIMARY KEY,
+    nume VARCHAR2(100),
+    telefon VARCHAR2(20),
+    mail VARCHAR2(100)
+);
+
+CREATE TABLE ELECTRONIC (
+    id_electronic INT PRIMARY KEY,
+    id_raion INT NOT NULL REFERENCES RAION(id_raion),
+    id_furnizor INT NOT NULL REFERENCES FURNIZOR(id_furnizor),
+    nume VARCHAR2(100),
+    culoare VARCHAR2(30),
+    pret_recomandat NUMBER,
+    cantitate_stoc NUMBER
+);
+
+
+CREATE TABLE ANGAJAT (
+    id_angajat INT PRIMARY KEY,
+    id_magazin INT REFERENCES MAGAZIN(id_magazin),
+    nume VARCHAR2(100),
+    departament VARCHAR2(50),
+    data_angajare DATE,
+    salariu NUMBER
+);
+
+CREATE TABLE CLIENT (
+    id_client INT PRIMARY KEY,
+    nume VARCHAR2(100),
+    telefon VARCHAR2(20)
+);
+
+CREATE TABLE COMANDA (
+    id_comanda INT PRIMARY KEY,
+    id_client INT NOT NULL REFERENCES CLIENT(id_client),
+    data DATE
+);
+
+CREATE TABLE DETALII_COMANDA (
+    id_detalii INT PRIMARY KEY,
+    id_comanda INT NOT NULL REFERENCES COMANDA(id_comanda),
+    id_electronic INT NOT NULL REFERENCES ELECTRONIC(id_electronic),
+    cantitate NUMBER,
+    firma_livrare VARCHAR2(50)
+);
+
+
+-- MAGAZIN (5)
+INSERT INTO MAGAZIN VALUES (1, 'ElectroMall', 'Bucuresti');
+INSERT INTO MAGAZIN VALUES (2, 'TechCenter', 'Cluj');
+INSERT INTO MAGAZIN VALUES (3, 'Electronix', 'Timisoara');
+INSERT INTO MAGAZIN VALUES (4, 'GigaTech', 'Iasi');
+INSERT INTO MAGAZIN VALUES (5, 'SmartShop', 'Constanta');
+
+-- RAION (5)
+INSERT INTO RAION VALUES (1, 1, 'Laptopuri');
+INSERT INTO RAION VALUES (2, 1, 'Telefoane');
+INSERT INTO RAION VALUES (3, 2, 'Televizoare');
+INSERT INTO RAION VALUES (4, 3, 'Electrocasnice mici');
+INSERT INTO RAION VALUES (5, 4, 'Tablete');
+
+-- FURNIZOR (5)
+INSERT INTO FURNIZOR VALUES (1, 'SAMSUNG', '0212345678', 'contact@samsung.ro');
+INSERT INTO FURNIZOR VALUES (2, 'APPLE', '0218765432', 'contact@apple.ro');
+INSERT INTO FURNIZOR VALUES (3, 'LG', '0264123456', 'contact@lg.ro');
+INSERT INTO FURNIZOR VALUES (4, 'HP', '0265987456', 'contact@hp.ro');
+INSERT INTO FURNIZOR VALUES (5, 'LENOVO', '0219988776', 'contact@lenovo.ro');
+
+-- ELECTRONIC (10)
+INSERT INTO ELECTRONIC VALUES (1, 1, 1, 'MacBook Pro', 'Argintiu', 12000,2);
+INSERT INTO ELECTRONIC VALUES (2, 2, 2, 'iPhone 14', 'Negru', 6000,3);
+INSERT INTO ELECTRONIC VALUES (3, 3, 3, 'LG OLED 55"', 'Gri', 5000,10);
+INSERT INTO ELECTRONIC VALUES (4, 1, 4, 'HP Spectre x360', 'Negru', 8500,1);
+INSERT INTO ELECTRONIC VALUES (5, 5, 5, 'Lenovo Yoga', 'Argintiu', 7000,0);
+INSERT INTO ELECTRONIC VALUES (6, 2, 2, 'iPhone 13', 'Alb', 5000,12);
+INSERT INTO ELECTRONIC VALUES (7, 3, 3, 'LG NanoCell 65"', 'Negru', 6000,3);
+INSERT INTO ELECTRONIC VALUES (8, 4, 4, 'Mixer Philips', 'Rosu', 350,10);
+INSERT INTO ELECTRONIC VALUES (9, 5, 5, 'Lenovo Tab P11', 'Gri', 1500,11);
+INSERT INTO ELECTRONIC VALUES (10, 1, 1, 'MacBook Air', 'Aur', 9500,23);
+
+-- ANGAJAT (5)
+INSERT INTO ANGAJAT VALUES (1, 1, 'Ion Popescu', 'Vanzari', TO_DATE('2022-03-15','YYYY-MM-DD'), 3500);
+INSERT INTO ANGAJAT VALUES (2, 2, 'Maria Ionescu', 'Marketing', TO_DATE('2021-07-20','YYYY-MM-DD'), 4000);
+INSERT INTO ANGAJAT VALUES (3, 3, 'Rares Georgescu', 'IT', TO_DATE('2023-01-10','YYYY-MM-DD'), 4500);
+INSERT INTO ANGAJAT VALUES (4, 4, 'Ana Marinescu', 'Vanzari', TO_DATE('2022-11-05','YYYY-MM-DD'), 3800);
+INSERT INTO ANGAJAT VALUES (5, 5, 'Dan Popa', 'Logistica', TO_DATE('2023-02-18','YYYY-MM-DD'), 3700);
+
+-- CLIENT (5)
+INSERT INTO CLIENT VALUES (1, 'Daniel Vasile', '0723456789');
+INSERT INTO CLIENT VALUES (2, 'Laura Marin', '0741234567');
+INSERT INTO CLIENT VALUES (3, 'Andrei Ionescu', '0732123456');
+INSERT INTO CLIENT VALUES (4, 'Mihaela Pop', '0765432198');
+INSERT INTO CLIENT VALUES (5, 'Radu Georgescu', '0756789123');
+
+-- COMANDA (10)
+INSERT INTO COMANDA VALUES (1, 1, TO_DATE('2025-09-07','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (2, 2, TO_DATE('2025-09-07','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (3, 3, TO_DATE('2025-09-06','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (4, 4, TO_DATE('2025-09-05','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (5, 5, TO_DATE('2025-09-04','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (6, 1, TO_DATE('2025-09-03','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (7, 2, TO_DATE('2025-09-02','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (8, 3, TO_DATE('2025-09-01','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (9, 4, TO_DATE('2025-08-31','YYYY-MM-DD'));
+INSERT INTO COMANDA VALUES (10, 5, TO_DATE('2025-08-30','YYYY-MM-DD'));
+
+-- DETALII_COMANDA (10)
+INSERT INTO DETALII_COMANDA VALUES (1, 1, 1, 1, 'DHL');
+INSERT INTO DETALII_COMANDA VALUES (2, 2, 2, 2, 'Fan Courier');
+INSERT INTO DETALII_COMANDA VALUES (3, 3, 3, 3, 'UPS');
+INSERT INTO DETALII_COMANDA VALUES (4, 4, 4, 4, 'DPD');
+INSERT INTO DETALII_COMANDA VALUES (5, 5, 5, 5, 'DHL');
+INSERT INTO DETALII_COMANDA VALUES (6, 6, 6, 6, 'Fan Courier');
+INSERT INTO DETALII_COMANDA VALUES (7, 7, 7, 7, 'UPS');
+INSERT INTO DETALII_COMANDA VALUES (8, 8, 8, 8, 'DPD');
+INSERT INTO DETALII_COMANDA VALUES (9, 9, 9, 9, 'DHL');
+INSERT INTO DETALII_COMANDA VALUES (10, 10, 10, 10, 'Fan Courier');
+
+-- MAGAZIN
+SELECT * FROM MAGAZIN;
+
+-- RAION
+SELECT * FROM RAION;
+
+-- ELECTRONIC
+SELECT * FROM ELECTRONIC;
+
+-- CLIENT
+SELECT * FROM CLIENT;
+
+-- FURNIZOR
+SELECT * FROM FURNIZOR;
+
+-- COMANDA
+SELECT * FROM COMANDA;
+
+--DETALII_COMANDA
+SELECT * FROM DETALII_COMANDA;
+
+-- ANGAJAT
+SELECT * FROM ANGAJAT;
+
+--12a)
+SELECT c.nume AS client, e.nume AS produs, f.nume AS furnizor, m.nume AS magazin
+FROM CLIENT c
+JOIN COMANDA co ON c.id_client = co.id_client
+JOIN DETALII_COMANDA dc ON co.id_comanda = dc.id_comanda
+JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+JOIN FURNIZOR f ON e.id_furnizor = f.id_furnizor
+JOIN RAION r ON e.id_raion = r.id_raion
+JOIN MAGAZIN m ON r.id_magazin = m.id_magazin
+WHERE dc.cantitate > 1;
+
+--12b)
+SELECT e.nume AS produs, e.cantitate_stoc,
+       (SELECT AVG(cantitate_stoc) FROM ELECTRONIC) AS media_stocurilor,
+       CASE 
+           WHEN e.cantitate_stoc > (SELECT AVG(cantitate_stoc) FROM ELECTRONIC) THEN 'STOC MARE'
+           ELSE 'STOC MIC'
+       END AS situatie_stoc
+FROM ELECTRONIC e;
+
+--12c)
+SELECT m.nume AS magazin, SUM(dc.cantitate) AS total_vandute
+FROM DETALII_COMANDA dc
+JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+JOIN RAION r ON e.id_raion = r.id_raion
+JOIN MAGAZIN m ON r.id_magazin = m.id_magazin
+GROUP BY m.nume
+HAVING SUM(dc.cantitate) > 
+       (SELECT AVG(total) FROM (
+            SELECT SUM(dc2.cantitate) AS total
+            FROM DETALII_COMANDA dc2
+            GROUP BY dc2.id_comanda
+       ));
+       
+--12d)
+       
+SELECT 
+    c.id_comanda,cl.nume AS nume_client,c.data,
+    NVL(dc.firma_livrare, 'NEPRECIZATA') AS firma_livrare,
+    DECODE(dc.firma_livrare, 
+           'Fan Courier', 'LIVRARE RAPIDA', 
+           'STANDARD') AS tip_livrare
+FROM comanda c
+JOIN client cl ON c.id_client = cl.id_client
+JOIN detalii_comanda dc ON c.id_comanda = dc.id_comanda
+ORDER BY c.data DESC;
+
+--12e)
+SELECT 
+    A.id_angajat,
+    A.nume,
+    EXTRACT(MONTH FROM SYSDATE) - EXTRACT(MONTH FROM A.data_angajare) 
+        + 12 * (EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM A.data_angajare)) AS luni_lucrate,
+    LOWER(A.nume) || '@magazin' || A.id_magazin || '.com' AS email,
+    CASE 
+        WHEN MONTHS_BETWEEN(SYSDATE, A.data_angajare) >= 24 THEN 'VETERAN'
+        ELSE 'NOU'
+    END AS status_angajat,
+    SUBSTR(A.nume, 1, 3) AS prefix_nume
+FROM ANGAJAT A
+WHERE EXTRACT(DAY FROM A.data_angajare) = 15
+  AND EXTRACT(MONTH FROM A.data_angajare) = 3;
+
+
+--12f)
+WITH total_comenzi_client AS (
+    SELECT 
+        c.id_client,c.nume AS client,
+        SUM(e.pret_recomandat * dc.cantitate) AS valoare_totala,
+        COUNT(DISTINCT cm.id_comanda) AS nr_comenzi
+    FROM CLIENT c
+    JOIN COMANDA cm ON c.id_client = cm.id_client
+    JOIN DETALII_COMANDA dc ON cm.id_comanda = dc.id_comanda
+    JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+    GROUP BY c.id_client, c.nume
+)
+SELECT *
+FROM total_comenzi_client
+WHERE valoare_totala > 10000
+ORDER BY valoare_totala DESC;
+
+--13)
+UPDATE ANGAJAT
+SET salariu = salariu * 1.1
+WHERE id_magazin = (
+    SELECT id_magazin 
+    FROM MAGAZIN 
+    WHERE oras = 'Cluj'
+);
+--13b)
+UPDATE DETALII_COMANDA
+SET firma_livrare = 'GLS'
+WHERE id_comanda IN (
+    SELECT id_comanda 
+    FROM COMANDA
+    WHERE data > TO_DATE('2025-09-01','YYYY-MM-DD')
+);
+
+--13c)
+DELETE FROM COMANDA c
+WHERE NOT EXISTS (
+    SELECT dc.id_comanda
+    FROM DETALII_COMANDA dc
+    WHERE dc.id_comanda = c.id_comanda
+)
+AND c.data < ADD_MONTHS(SYSDATE, -1);
+
+--15)
+SELECT c.id_comanda, cl.nume AS nume_client, e.nume AS nume_produs, 
+       m.nume AS nume_magazin, f.nume AS furnizor, dc.firma_livrare
+FROM COMANDA c
+LEFT OUTER JOIN CLIENT cl ON c.id_client = cl.id_client
+LEFT OUTER JOIN DETALII_COMANDA dc ON c.id_comanda = dc.id_comanda
+LEFT OUTER JOIN ELECTRONIC e ON dc.id_electronic = e.id_electronic
+LEFT OUTER JOIN RAION r ON e.id_raion = r.id_raion
+LEFT OUTER JOIN MAGAZIN m ON r.id_magazin = m.id_magazin
+LEFT OUTER JOIN FURNIZOR f ON e.id_furnizor = f.id_furnizor;
+
+--15topn
+SELECT *
+FROM (
+    SELECT e.id_electronic, e.nume, e.pret_recomandat
+    FROM ELECTRONIC e
+    ORDER BY e.pret_recomandat DESC
+)
+WHERE ROWNUM <= 3;
+
+Select f.nume as nume_furnizor,count(*) as numar_electronice
+from furnizor f
+join electronic e on  f.id_furnizor=e.id_furnizor
+group by f.nume;
+
+
+
